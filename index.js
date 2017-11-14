@@ -8,15 +8,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const bookmarks = [];
 
-app.get('/', (req, res) => {
-    res.status(200).send();
-});
+app.use('/', express.static('public'));
 
-app.get('/bookmarks', (req, res) => {
+app.get('/api/bookmarks', (req, res) => {
     res.json({ bookmarks });
 })
 
-app.post('/bookmarks', (req, res) => {
+app.post('/api/bookmarks', (req, res) => {
     if (req.body && req.body.url) {
         bookmarks.push(req.body.url);
         return res.status(200).send();
