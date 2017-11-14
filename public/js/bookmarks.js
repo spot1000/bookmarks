@@ -2,43 +2,41 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM fully loaded and parsed');
 
-    getBookmarks(function(error, bookmarks) {
-        if (error) {
-            throw error;
-        }
-        updateBookmarks(bookmarks);
-    });
+    getBookmarks()
+        .then(function (bookmarks) {
+            updateBookmarks(bookmarks);
+        })
+        .catch(function(e) {
+            throw e;
+        });
 
     var addBookmarkForm = document.getElementById('add-bookmark');
     addBookmarkForm.addEventListener("submit", function (event) {
         event.preventDefault();
 
-        addBookmark(addBookmarkForm, function(error) {
-            if (error) {
-                throw error;
-            }
-
-            console.log('Bookmark added!');
-
-            getBookmarks(function(error, bookmarks) {
-                if (error) {
-                    throw error;
-                }
+        addBookmark(addBookmarkForm)
+            .then(getBookmarks)
+            .then(function(bookmarks) {
                 updateBookmarks(bookmarks);
+                console.log('Bookmark added!');
+            })
+            .catch(function(e) {
+                throw e;
             });
-        });
     });
 });
 
-function getBookmarks(callback) {
-    $.ajax({
-        url: '/api/bookmarks',
-        success: function(data) {
-            callback(null, data.bookmarks);
-        },
-        error: function() {
-            callback(new Error('Error downloading bookmarks'));
-        }
+function getBookmarks() {
+    return new Promise(function(resolve, reject) {
+        $.ajax({
+            url: '/api/bookmarks',
+            success: function(data) {
+                resolve(data.bookmarks);
+            },
+            error: function() {
+                reject(new Error('Error downloading bookmarks'));
+            }
+        });
     });
 }
 
@@ -60,20 +58,22 @@ function updateBookmarks(bookmarks) {
     }
 }
 
-function addBookmark(form, callback) {
-    var bookmarkData = new FormData(form);
-
-    $.ajax({
-        url: '/api/bookmarks',
-        type: 'POST',
-        data: bookmarkData,
-        processData: false,
-        contentType: false,
-        success: function() {
-            callback(null);
-        },
-        error: function() {
-            callback(new Error('Error adding bookmark'));
-        }
+function addBookmark(form) {
+    return new Promise(function(resolve, reject) {
+        var bookmarkData = new FormData(form);
+        
+        $.ajax({
+            url: '/api/bookmarks',
+            type: 'POST',
+            data: bookmarkData,
+            processData: false,
+            contentType: false,
+            success: function() {
+                resolve();
+            },
+            error: function() {
+                reject(new Error('Error adding bookmark'));
+            }
+        });
     });
 }
