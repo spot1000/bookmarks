@@ -8,6 +8,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         updateBookmarks(bookmarks);
     });
+
+    var addBookmarkForm = document.getElementById('add-bookmark');
+    addBookmarkForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        addBookmark(addBookmarkForm, function(error) {
+            if (error) {
+                throw error;
+            }
+
+            console.log('Bookmark added!');
+        });
+    });
 });
 
 function getBookmarks(callback) {
@@ -46,3 +59,20 @@ function updateBookmarks(bookmarks) {
     }
 }
 
+function addBookmark(form, callback) {
+    var bookmarkData = new FormData(form);
+
+    var addBookmarkRequest = new XMLHttpRequest();
+
+    addBookmarkRequest.onreadystatechange = function getBookmarks() {
+        if (addBookmarkRequest.readyState === XMLHttpRequest.DONE) {
+            if (addBookmarkRequest.status === 200) {
+                callback(null);
+            } else {
+                callback(new Error('Error adding bookmark: ' + addBookmarkRequest.status))
+            }
+        }
+    }
+    addBookmarkRequest.open('POST', '/api/bookmarks');
+    addBookmarkRequest.send(bookmarkData);
+}

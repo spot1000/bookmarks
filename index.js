@@ -1,10 +1,10 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+const multer  = require('multer');
+const upload = multer();
 
 const port = 8888;
 
 const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
 
 const bookmarks = [];
 
@@ -14,7 +14,7 @@ app.get('/api/bookmarks', (req, res) => {
     res.json({ bookmarks });
 })
 
-app.post('/api/bookmarks', (req, res) => {
+app.post('/api/bookmarks', upload.array(), (req, res) => {
     if (req.body && req.body.url) {
         bookmarks.push(req.body.url);
         return res.status(200).send();

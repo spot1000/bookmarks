@@ -7,6 +7,11 @@
     </head>
     <body>
         <h1>Bookmarks</h1>
+        <form id="add-bookmark" action="/api/bookmarks" method="POST">
+            <label for="add-bookmark-url">URL:</label>
+            <input id="add-bookmark-url" type="text" name="url">
+            <input type="submit" value="Save">
+        </form>
         <div id="bookmarks">
             <p>Bookmarks loading...</p>
         </div>
