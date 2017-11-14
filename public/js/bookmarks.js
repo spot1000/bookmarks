@@ -27,17 +27,17 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function getBookmarks() {
-    return new Promise(function(resolve, reject) {
-        $.ajax({
-            url: '/api/bookmarks',
-            success: function(data) {
-                resolve(data.bookmarks);
-            },
-            error: function() {
-                reject(new Error('Error downloading bookmarks'));
+    return fetch('/api/bookmarks')
+        .then(function(response) {
+            if (response.status !== 200) {
+                return Promise.reject(new Error(response.statusText));
             }
+
+            return response.json();
+        })
+        .then(function(json) {
+            return json.bookmarks;
         });
-    });
 }
 
 function updateBookmarks(bookmarks) {
@@ -59,21 +59,15 @@ function updateBookmarks(bookmarks) {
 }
 
 function addBookmark(form) {
-    return new Promise(function(resolve, reject) {
-        var bookmarkData = new FormData(form);
-        
-        $.ajax({
-            url: '/api/bookmarks',
-            type: 'POST',
-            data: bookmarkData,
-            processData: false,
-            contentType: false,
-            success: function() {
-                resolve();
-            },
-            error: function() {
-                reject(new Error('Error adding bookmark'));
+    var bookmarkData = new FormData(form);
+
+    return fetch('/api/bookmarks', {
+        method: 'POST',
+        body: bookmarkData
+    })
+        .then(function(response) {
+            if (response.status !== 200) {
+                return Promise.reject(new Error(response.statusText));
             }
         });
-    });
 }
