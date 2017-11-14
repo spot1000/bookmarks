@@ -19,6 +19,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             console.log('Bookmark added!');
+
+            getBookmarks(function(error, bookmarks) {
+                if (error) {
+                    throw error;
+                }
+                updateBookmarks(bookmarks);
+            });
         });
     });
 });
