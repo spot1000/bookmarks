@@ -31,21 +31,15 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function getBookmarks(callback) {
-    var bookmarksRequest = new XMLHttpRequest();
-
-    bookmarksRequest.onreadystatechange = function getBookmarks() {
-        if (bookmarksRequest.readyState === XMLHttpRequest.DONE) {
-            if (bookmarksRequest.status === 200) {
-                var response = JSON.parse(bookmarksRequest.responseText);
-
-                callback(null, response.bookmarks);
-            } else {
-               callback(new Error('Error downloading bookmarks: ' + bookmarksRequest.status));
-            }
+    $.ajax({
+        url: '/api/bookmarks',
+        success: function(data) {
+            callback(null, data.bookmarks);
+        },
+        error: function() {
+            callback(new Error('Error downloading bookmarks'));
         }
-    }
-    bookmarksRequest.open('GET', '/api/bookmarks');
-    bookmarksRequest.send();
+    });
 }
 
 function updateBookmarks(bookmarks) {
@@ -69,17 +63,17 @@ function updateBookmarks(bookmarks) {
 function addBookmark(form, callback) {
     var bookmarkData = new FormData(form);
 
-    var addBookmarkRequest = new XMLHttpRequest();
-
-    addBookmarkRequest.onreadystatechange = function getBookmarks() {
-        if (addBookmarkRequest.readyState === XMLHttpRequest.DONE) {
-            if (addBookmarkRequest.status === 200) {
-                callback(null);
-            } else {
-                callback(new Error('Error adding bookmark: ' + addBookmarkRequest.status))
-            }
+    $.ajax({
+        url: '/api/bookmarks',
+        type: 'POST',
+        data: bookmarkData,
+        processData: false,
+        contentType: false,
+        success: function() {
+            callback(null);
+        },
+        error: function() {
+            callback(new Error('Error adding bookmark'));
         }
-    }
-    addBookmarkRequest.open('POST', '/api/bookmarks');
-    addBookmarkRequest.send(bookmarkData);
+    });
 }
