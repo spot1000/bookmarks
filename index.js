@@ -23,6 +23,11 @@ app.post('/api/bookmarks', upload.array(), (req, res) => {
     res.status(400).send();
 })
 
+app.post('/api/bookmarks/:index', (req, res) => {
+    bookmarks.splice(req.params.index, 1);
+    return res.status(200).send();    
+})
+
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });

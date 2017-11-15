@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw e;
             });
     });
+    
 });
 
 function getBookmarks() {
@@ -49,10 +50,27 @@ function updateBookmarks(bookmarks) {
     for (var i = 0; i < bookmarks.length; i++) {
         var bookmark = document.createElement('div');
         var documentUrl = document.createElement('a');
+        var deleteButton = document.createElement('button')
         documentUrl.innerHTML = bookmarks[i];
         documentUrl.setAttribute('href', bookmarks[i]);
+        documentUrl.innerHTML = bookmarks[i];
+        deleteButton.setAttribute('data-path', '/api/bookmarks/' + i);
+        deleteButton.innerHTML = 'Delete';
+        deleteButton.addEventListener('click', function(event) {
+            var path = this.getAttribute('data-path')
+            deleteBookmark(path)
+            .then(getBookmarks)
+            .then(function(bookmarks) {
+                updateBookmarks(bookmarks);
+                console.log('Bookmark added!');
+            })
+            .catch(function(e) {
+                throw e;
+            });
+        });
 
-        bookmark.appendChild(documentUrl);
+        bookmark.appendChild(deleteButton)   
+        bookmark.appendChild(documentUrl)
 
         bookmarksContainer.appendChild(bookmark);
     }
@@ -71,3 +89,14 @@ function addBookmark(form) {
             }
         });
 }
+
+function deleteBookmark(path) {
+    return fetch(path,  {
+        method: "POST"        
+    })
+    .then(function(response) {
+        if (response.status !== 200) {
+            return Promise.reject(new Error(response.statusText))
+        }
+    })
+ }
